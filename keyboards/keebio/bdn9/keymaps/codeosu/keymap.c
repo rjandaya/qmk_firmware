@@ -19,12 +19,7 @@
 bool     is_alt_tab_active = false;
 uint16_t alt_tab_timer     = 0;
 
-enum bdn9_layers { 
-    GENERAL = 0, 
-    CODE, 
-    OSU, 
-    ADJUST 
-};
+enum bdn9_layers { GENERAL = 0, CODE, OSU, ADJUST };
 
 enum encoder_names {
     _LEFT,
@@ -60,10 +55,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         │ Cut       │ Copy      │ Paste     │  // Bottom Row
         └───────────┴───────────┴───────────┘
      */
-    [GENERAL] = LAYOUT(
-        TO(ADJUST), TO(CODE), KC_MUTE, 
-        KC_MPRV, KC_MPLY, KC_MNXT, 
-        C(KC_X), C(KC_C), C(KC_V)),
+    [GENERAL] = LAYOUT(TO(ADJUST), TO(CODE), KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT, C(KC_X), C(KC_C), C(KC_V)),
     /*  Layer: Code
         ┌───────────┬───────────┬───────────┐
         │ Undo Redo │Word Scroll│  Search   │
@@ -76,10 +68,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         │ Cut       │ Copy      │ Paste     │  // Bottom Row
         └───────────┴───────────┴───────────┘
      */
-    [CODE] = LAYOUT(
-        TO(GENERAL), TO(OSU), C(KC_N), 
-        C(KC_A), M_COPYA, C(KC_S), 
-        C(KC_X), C(KC_C), C(KC_V)),
+    [CODE] = LAYOUT(TO(GENERAL), TO(OSU), C(KC_N), C(KC_A), M_COPYA, C(KC_S), C(KC_X), C(KC_C), C(KC_V)),
     /*  Layer: osu!
         ┌───────────┬───────────┬───────────┐
         │osu! Volume│    N/A    │    N/A    │
@@ -92,10 +81,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         │ Z         │ X         │ Space     │  // Bottom Row
         └───────────┴───────────┴───────────┘
      */
-    [OSU] = LAYOUT(
-        TO(CODE), TO(ADJUST), KC_NO, 
-        KC_ESC, KC_GRAVE, C(KC_O), 
-        KC_Z, KC_X, KC_SPC),
+    [OSU] = LAYOUT(TO(CODE), TO(ADJUST), KC_NO, KC_ESC, KC_GRAVE, C(KC_O), KC_Z, KC_X, KC_SPC),
     /*  Layer: Adjustment
         ┌───────────┬───────────┬───────────┐
         │ RGB Mode  │  RGB Hue  │  RGB Sat  │
@@ -108,10 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         │ RGB Val-  │ RGB SPD-  │ N/A       │  // Bottom Row
         └───────────┴───────────┴───────────┘
      */
-    [ADJUST] = LAYOUT(
-        TO(OSU), TO(GENERAL), RGB_TOG, 
-        RGB_VAI, RGB_SPI, KC_NO, 
-        RGB_VAD, RGB_SPD, KC_NO),
+    [ADJUST] = LAYOUT(TO(OSU), TO(GENERAL), RGB_TOG, RGB_VAI, RGB_SPI, KC_NO, RGB_VAD, RGB_SPD, KC_NO),
 };
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
@@ -227,18 +210,22 @@ void matrix_scan_user(void) {
 }
 
 // Allow the desired RGB Mode to persist, but set one LED as the layer indicator
-void rgb_matrix_indicators_user(void) {
+bool rgb_matrix_indicators_kb(void) {
+    if (!rgb_matrix_indicators_user()) {
+        return false;
+    }
     switch (get_highest_layer(layer_state)) {
         case GENERAL:
-            break;
+            return true;
         case CODE:
             rgb_matrix_set_color(4, RGB_WHITE);
-            break;
+            return true;
         case OSU:
             rgb_matrix_set_color(4, RGB_PINK);
-            break;
+            return true;
         case ADJUST:
             rgb_matrix_set_color(4, RGB_TEAL);
-            break;
+            return true;
     }
+    return true;
 }
